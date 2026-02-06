@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Valentine?</title>
   <style>
     :root{
@@ -14,115 +14,217 @@
       --muted:#ffffffc9;
       --yes1:#ff4d7d;
       --yes2:#ff2d55;
-      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --no1:#60a5fa;
+      --no2:#22c55e;
+      --shadow: 0 18px 55px rgba(0,0,0,.45);
       --radius: 22px;
     }
+
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:#fff;
-      overflow:hidden;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      overflow:hidden;             /* avoid scroll on mobile */
+      touch-action: manipulation;  /* reduce double-tap zoom issues */
       background:
         radial-gradient(1200px 800px at 20% 20%, #ff4d7d2a, transparent 60%),
         radial-gradient(1000px 700px at 80% 30%, #a855f72a, transparent 55%),
+        radial-gradient(900px 600px at 50% 90%, #22c55e1f, transparent 55%),
         linear-gradient(140deg, var(--bg1), var(--bg2));
       display:grid;
       place-items:center;
+      padding:
+        max(14px, env(safe-area-inset-top))
+        max(14px, env(safe-area-inset-right))
+        max(14px, env(safe-area-inset-bottom))
+        max(14px, env(safe-area-inset-left));
     }
+
+    .wrap{
+      width:min(920px, 92vw);
+    }
+
     .card{
-      background:#ffffff14;
-      border-radius:22px;
-      padding:40px;
-      width:min(800px,90vw);
-      box-shadow:0 20px 60px rgba(0,0,0,.45);
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      border:1px solid #ffffff22;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 4vw, 38px);
       text-align:center;
-      position:relative;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
+
     h1{
-      font-size:clamp(30px,5vw,54px);
-      margin-bottom:12px;
+      margin: 8px 0 10px;
+      font-size: clamp(26px, 7vw, 54px);
+      line-height:1.05;
+      letter-spacing:-0.6px;
     }
+
     p{
-      color:#ffffffc9;
-      font-size:18px;
-      margin-bottom:30px;
+      margin: 0 auto 18px;
+      color: var(--muted);
+      font-size: clamp(14px, 4.2vw, 18px);
+      max-width: 55ch;
     }
+
     .stage{
       position:relative;
-      height:220px;
-      border-radius:18px;
-      border:1px dashed #ffffff33;
+      height: clamp(220px, 36vh, 320px); /* responsive stage height */
+      border-radius: 18px;
+      border:1px dashed #ffffff2b;
+      background: #00000012;
       display:flex;
-      justify-content:center;
       align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      padding: 14px;
     }
-    button{
-      border:none;
-      padding:14px 22px;
-      border-radius:16px;
-      font-size:18px;
-      font-weight:800;
+
+    .row{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:0;
       cursor:pointer;
-      color:#fff;
-      position:absolute;
+      font-weight:900;
+      letter-spacing:.2px;
+      padding: 16px 22px;               /* bigger tap area */
+      border-radius: 16px;
+      color:white;
+      min-width: 150px;
+      font-size: clamp(16px, 4.6vw, 18px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform .12s ease, filter .12s ease;
     }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+    .btn:hover{ filter: brightness(1.03); }
+
     .yes{
-      background:linear-gradient(135deg,#ff4d7d,#ff2d55);
-      position:static;
+      background: linear-gradient(135deg, var(--yes1), var(--yes2));
+      position: static;
     }
+
     .no{
-      background:linear-gradient(135deg,#3b82f6,#22c55e);
+      background: linear-gradient(135deg, var(--no1), var(--no2));
+      position:absolute;
+      left: 60%;
+      top: 58%;
+      transform: translate(-50%,-50%);
     }
+
     .msg{
-      margin-top:20px;
-      font-size:20px;
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background:#ffffff12;
+      border:1px solid #ffffff25;
+      color:#fff;
       display:none;
       font-weight:900;
+      font-size: clamp(16px, 4.6vw, 19px);
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size: 13px;
+      color:#ffffffb5;
     }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Will you be my Valentine? 💘</h1>
+      <p>There’s only one correct answer… but you can still *try* the other one 😄</p>
 
-  <div class="card">
-    <h1>Will you be my Valentine? 💘</h1>
-    <p>There is only one correct answer 😌</p>
+      <div class="stage" id="stage">
+        <div class="row">
+          <button class="btn yes" id="yesBtn">Yes 😍</button>
+        </div>
+        <button class="btn no" id="noBtn" aria-label="No">No 🙃</button>
+      </div>
 
-    <div class="stage" id="stage">
-      <button class="yes" id="yes">Yes 😍</button>
-      <button class="no" id="no">No 🙃</button>
-    </div>
+      <div class="msg" id="msg">
+        I knew you want to be my Valentine 💖
+      </div>
 
-    <div class="msg" id="msg">
-      I knew you want to be my Valentine 💖
+      <div class="hint" id="hint">Try to tap “No” 😏</div>
     </div>
   </div>
 
-<script>
-  const noBtn = document.getElementById("no");
-  const stage = document.getElementById("stage");
-  const yesBtn = document.getElementById("yes");
-  const msg = document.getElementById("msg");
+  <script>
+    const stage = document.getElementById("stage");
+    const noBtn  = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const msg    = document.getElementById("msg");
+    const hint   = document.getElementById("hint");
 
-  function moveNo(){
-    const s = stage.getBoundingClientRect();
-    const b = noBtn.getBoundingClientRect();
-    const x = Math.random() * (s.width - b.width);
-    const y = Math.random() * (s.height - b.height);
-    noBtn.style.left = x + "px";
-    noBtn.style.top = y + "px";
-  }
+    function moveNoButton(){
+      const s = stage.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
 
-  noBtn.addEventListener("mouseenter", moveNo);
-  noBtn.addEventListener("click", moveNo);
+      // Keep button inside stage with padding
+      const pad = 10;
+      const maxX = Math.max(pad, s.width  - b.width  - pad);
+      const maxY = Math.max(pad, s.height - b.height - pad);
 
-  yesBtn.addEventListener("click", ()=>{
-    msg.style.display = "block";
-  });
+      const x = pad + Math.random() * (maxX - pad);
+      const y = pad + Math.random() * (maxY - pad);
 
-  moveNo();
-</script>
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+      noBtn.style.transform = "translate(0,0)";
+    }
 
+    let dodges = 0;
+
+    // Mobile-friendly: pointer events cover mouse + touch
+    noBtn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      dodges++;
+      moveNoButton();
+
+      if (dodges === 1) hint.textContent = "Oops 😅 try again";
+      if (dodges === 3) hint.textContent = "Not happening 😌";
+      if (dodges >= 6) hint.textContent = "Just press YES already 😂";
+    });
+
+    // Bonus: if finger/mouse gets close, dodge (works on desktop)
+    stage.addEventListener("pointermove", (e) => {
+      const nb = noBtn.getBoundingClientRect();
+      const dx = e.clientX - (nb.left + nb.width/2);
+      const dy = e.clientY - (nb.top + nb.height/2);
+      const dist = Math.hypot(dx, dy);
+      if (dist < 90) moveNoButton();
+    });
+
+    yesBtn.addEventListener("click", () => {
+      msg.style.display = "block";
+      hint.textContent = "Correct answer ✅";
+
+      // Disable No after Yes
+      noBtn.disabled = true;
+      noBtn.style.opacity = "0.55";
+      noBtn.style.cursor = "not-allowed";
+    });
+
+    // initial placement after layout
+    setTimeout(moveNoButton, 50);
+
+    // if phone rotates, reposition so it stays inside
+    window.addEventListener("resize", () => setTimeout(moveNoButton, 50));
+  </script>
 </body>
 </html>
